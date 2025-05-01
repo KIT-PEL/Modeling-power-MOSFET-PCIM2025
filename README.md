@@ -15,3 +15,15 @@ The garber files of the circuit board used in the paper, the program source code
 
 Contact information (replace <%%> with @):
 - Hajime Takayama (hajime-takayama <%%> kit.ac.jp)
+
+
+## Reference
+We would greatly appreciate it if you could kindly acknowledge our tool in your research by referencing the following publications:
+````
+@inproceedings{TakayamaModelingPCIM2025,
+   title={Accurate Power MOSFET Modeling using Off-the-shelf Instruments},
+   author={Takayama, Hajime and Nishitani, Yota and MAtsumoto, Kazuki and Sato, Takashi and Shintani, Michihiro},
+   booktitle={{in PCIM Europe 2025 (to appear)}},
+   year={2025}
+}
+````
