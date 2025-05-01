@@ -1,0 +1,117 @@
+`include "disciplines.vams"
+
+module mosfet(term_G, term_D, term_S); // No.12
+
+   inout term_G, term_D, term_S;
+   electrical term_G, term_D, term_S, idiode;
+
+   branch (term_G, term_S) b_gs;
+   branch (term_D, term_G) b_dg;
+   branch (term_D, term_S) b_ds;
+   
+   // Parameters for Capacitance
+   parameter real CGSO = 2.78e-09; // Cgs
+   parameter real CDSO = 3.100e-09; // Cds
+   parameter real CDSV = 1.998;
+   parameter real CDSM = 0.579;
+   
+   parameter real A = 4.5;
+   parameter real B = 0.358e-09;
+   parameter real C = 0.5;
+   parameter real D = 2.29e-09;
+   parameter real F = A / 2;
+   parameter real QB = 5.437995051677523e-09;
+   parameter real QC = 5.437995051677523e-09;
+
+   parameter real bdg = 0.3;
+   parameter real gmin = 1e-12 from [0:1);
+   
+   // Transistor Parameters
+   parameter real VTH = 3.876581166799705;
+   parameter real R1 = 0.0009470608862171494;
+   parameter real DELTA = 2.1805569927852284;
+   parameter real K1 = 0.05580844405347375;
+   parameter real CLM = 0.0013412635456363756;
+   parameter real MOB = 0.5275894637082654;
+   parameter real MOVTH = 0.5578978094137398;
+   parameter real BBB = 0.5355380598812228;
+   parameter real J1 = 0.133911716449195;
+   parameter real M1 = 2.002516168989263;
+   parameter real N1 = 3.4895826063028696;
+
+   // Diode Parameters
+   parameter real IS = 6.36959039632e-09;
+   parameter real N = 0.0503305316259;
+   parameter real RS = 0.0388486854316;
+   
+   real Vgs, Vds, Vdg, Ids, Iold, Vdsmod, Vp, Vdssat, Idsat;
+   real Qgs, Qds, Qdg;
+   real Qdg1, Qdg2, smooth_Qdg;
+   real Vd, Id, Vr, Im;
+   
+   analog begin
+      // Read Voltages
+      Vgs = V(b_gs);
+      Vds = V(b_ds);
+      Vdg = V(b_dg);
+      Iold = I(b_ds);
+
+      // Calculate Drain Current
+      Vp = Vgs - VTH;
+      if (Vp > 0) begin
+         Vdssat = J1 * pow(Vp, M1);
+         Idsat = K1 * pow(Vp, N1);
+      end else begin
+         Vdssat = 0;
+         Idsat = 0;
+      end
+
+      // Adjust Vds
+      Vds = Vds - R1 * Iold;
+      Vdg = Vds - Vgs;
+      if (DELTA < 0.0) begin
+         Vdsmod = (Vds < Vp) ? Vds : Vp;
+      end else if (Vp < 0.0) begin
+         Vdsmod = Vds;
+      end else begin
+         Vdsmod = Vds / pow(1.0 + pow(Vds / Vdssat, DELTA), 1.0 / DELTA);
+      end
+      
+      // Compute Ids
+      Ids = Idsat * (2 - Vdsmod / Vdssat) * (Vdsmod / Vdssat) * 0.5 * (1 + tanh((Vgs - VTH) / BBB));
+      Ids = Ids * (1.0 + CLM * Vds);
+      if (Vgs > MOVTH) begin
+         Ids = Ids / (1.0 + MOB * (Vgs - MOVTH));
+      end
+      if (V(b_ds) < 0.0) begin
+         Ids = 0.0;
+      end
+      
+      // Compute Capacitances
+      Qgs = CGSO * Vgs;
+      Qds = CDSO * CDSV / (1.0 - CDSM) * pow(1.0 + Vds / CDSV, 1.0 - CDSM) - CDSO * CDSV / (1.0 - CDSM);
+      
+      if (Vdg < -0.5 * A) begin
+         Qdg1 = -2 * B * pow(0.5 * A, C) - QB;
+      end else begin
+         Qdg1 = -2 * B * pow(Vdg + 0.5 * A, C) - QB;
+      end
+      Qdg2 = D * Vdg + 2 * B * pow(0.5 * A, C) + 0.5 * A * D - QC;
+      smooth_Qdg = 0.5 + 0.5 * tanh((Vdg - F) / bdg);
+      Qdg = Qdg1 * smooth_Qdg + Qdg2 * (1 - smooth_Qdg);
+      
+      // Assign Current Sources
+      I(b_ds) <+ Ids + ddt(Qds);
+      I(b_gs) <+ ddt(Qgs);
+      I(b_dg) <+ ddt(Qdg);
+      
+      // Diode Model
+      Vd = -V(b_ds);
+      Id = V(idiode);
+      Vr = Id * RS;
+      Im = IS * (exp((Vd - Vr) / N) - 1.0);
+      Id = Im + gmin * Vd;
+      I(b_ds) <+ -Id;
+      V(idiode) <+ Id;
+   end
+endmodule
