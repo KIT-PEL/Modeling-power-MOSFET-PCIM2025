@@ -2,7 +2,7 @@
 Repository for supplemental materials of our paper presented at PCIM2025, "Accurate Power MOSFET Modeling using Off-the-shelf Instruments"
 
 **Important Note:**
-When you use this program, please refer to the paper as shown below and cite it in your work. The program is provided as is, and the authors are not responsible for any damages or issues that may arise from its use.
+When you use this program in your publication, please refer to the paper as shown below and cite it in your work. The program is provided as is, and the authors are not responsible for any damages or issues that may arise from its use.
 
 The paper can be found at [IEEE Xplore](URL not available at this moment).
 
