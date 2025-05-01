@@ -22,7 +22,7 @@ We would greatly appreciate it if you could kindly acknowledge our tool in your 
 ````
 @inproceedings{TakayamaModelingPCIM2025,
    title={Accurate Power MOSFET Modeling using Off-the-shelf Instruments},
-   author={Takayama, Hajime and Nishitani, Yota and MAtsumoto, Kazuki and Sato, Takashi and Shintani, Michihiro},
+   author={Takayama, Hajime and Nishitani, Yota and Matsumoto, Kazuki and Sato, Takashi and Shintani, Michihiro},
    booktitle={{in PCIM Europe 2025 (to appear)}},
    year={2025}
 }
