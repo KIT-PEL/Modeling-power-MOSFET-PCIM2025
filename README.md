@@ -13,7 +13,5 @@ The bibliographic information is as follows:
 This repository provides the supplemental materials of our paper presented at PCIM2025, entitled "Accurate Power MOSFET Modeling using Off-the-shelf Instruments."
 The garber files of the circuit board used in the paper, the program source codes, and the sample data for SiC power MOSFET modeling are provided.
 
-Author : Kazuki MATSUMOTO, Hajime Takayama (Kyoto Institute Technology)
-
 Contact information (replace <%%> with @):
 - Hajime Takayama (hajime-takayama <%%> kit.ac.jp)
